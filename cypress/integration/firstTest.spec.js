@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+const { intersection } = require("lodash")
+
 describe('Training Test Suite 1', () => {
 
     it('First Test', () => {
@@ -149,7 +151,7 @@ describe('Training Test Suite 1', () => {
         )
     })
 
-    it.only('Assert property value', () => {
+    it('Assert property value', () => {
 
         cy.visit('/')
         cy.contains('Forms').click()
@@ -163,5 +165,76 @@ describe('Training Test Suite 1', () => {
                 cy.wrap(input).invoke('prop', 'value').should('contain', '17')
 
             })
+    })
+
+    it('Radio Button', () => {
+
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Form Layout').click()
+
+        cy.contains('nb-card', 'Using the Grid')
+            .find('[type="radio"]')
+            .then(radioButtons => {
+                cy.wrap(radioButtons)
+                    .first()                        // sane as index = 0
+                    .check({ force: true })         // ignores the "hidden" value and execute the check action
+                    .should('be.checked')
+                
+                cy.wrap(radioButtons)
+                    .eq(1)                          // uses the index value
+                    .check({ force: true })
+                
+                cy.wrap(radioButtons)
+                    .eq(0)
+                    .should('not.be.checked')
+                
+                cy.wrap(radioButtons)
+                    .eq(2)
+                    .should('be.disabled')
+            })
+    })
+
+    it('Check Box', () => {
+
+        cy.visit('/')
+        cy.contains('Modal & Overlays').click()
+        cy.contains('Toastr').click()
+
+        // cy.get('[type="checkbox"]').check({ force: true })       // Sets ALL checkbox to status of "checked"
+        cy.get('[type="checkbox"]').eq(0).click({ force: true })    // Must use "click" to "uncheck" a box
+        cy.get('[type="checkbox"]').eq(0).check({ force: true })    // "Recheck" the box
+    })
+
+    it.only('Lists and Dropdowns', () => {
+        cy.visit('/')
+
+        //1 - Initial process to verify that an item has been checked in a dropdown list
+        // cy.get('nav nb-select').click()
+        // cy.get('.options-list').contains('Dark').click()
+        // cy.get('nav nb-select').should('contain', 'Dark')
+        // cy.get('nb-layout-header nav').should('have.css', 'background-color', 'rgb(34, 43, 69)')
+
+        //2 - Now lets do it using iteration
+        cy.get('nav nb-select').then(dropdown => {
+            cy.wrap(dropdown).click()
+            cy.get('.options-list nb-option')  // returns all available options
+                .each(listItem => {
+                    const itemText = listItem.text().trim()
+
+                    const colors = {
+                        "Light": "rgb(255, 255, 255)",
+                        "Dark": "rgb(34, 43, 69)",
+                        "Cosmic": "rgb(50, 50, 89)",
+                        "Corporate": "rgb(255, 255, 255)"
+                    }
+
+                    cy.wrap(listItem).click()  // Click on the current indexed listItem
+                    cy.wrap(dropdown).should('contain', itemText)   // Verify that the dropdown field now has the chosen text
+                    cy.get('nb-layout-header nav')
+                        .should('have.css', 'background-color', colors[itemText]) // Verify the backround using a variable
+                    cy.wrap(dropdown).click() // Reclick on the dropdown so that the list becomes available in the Dom
+                })
+        })
     })
 })
