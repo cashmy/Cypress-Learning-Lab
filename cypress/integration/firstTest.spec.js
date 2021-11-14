@@ -103,10 +103,16 @@ describe('Training Test Suite 1', () => {
             expect(passwordLabelFirst).to.equal('Password')
 
             // Now compare text on one form with the text on another form
+            // This obviously uses a nested function.
             cy.contains('nb-card', 'Basic form').then(secondForm => {
                 const passwordLabelSecond = secondForm.find('[for="exampleInputPassword1"]').text()
                 expect(passwordLabelFirst).to.equal(passwordLabelSecond)
+
+                // To stay within the Cypress functions we can use the "wrap"
+                // This will accomplish the same effect as the "expect" of JQuery
+                cy.wrap(secondForm).find('[for="exampleInputPassword1"]').should('contain', 'Password')
             })
+
         })
     })
 })
