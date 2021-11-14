@@ -42,7 +42,7 @@ describe('Training Test Suite 1', () => {
 
     it('Second Test', () => {
 
-        cy.visit('/')  
+        cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
 
@@ -61,17 +61,17 @@ describe('Training Test Suite 1', () => {
             .parents('form')
             .find('nb-checkbox')
             .click()
-        
+
         //Find text the nb-card which contains text "Horizontal form" and within the card find the web-element that has the attr-email
-        cy.contains('nb-card','Horizontal form').find('[type="email"]')
+        cy.contains('nb-card', 'Horizontal form').find('[type="email"]')
     })
 
-    it.only('"Then" and "Wrap" methods', () => {
+    it('"Then" and "Wrap" methods', () => {
 
         cy.visit('/')
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
-        
+
         // & This is highly redundant and violates the DRY principle
         // cy.contains('nb-card', 'Using the Grid')
         //     .find('[for="inputEmail1"]')
@@ -96,7 +96,7 @@ describe('Training Test Suite 1', () => {
         // * The Cypress way (which is asynchronus - Using a Promise)
         // The parameter "firstForm" becomes a JQuery method instead of a Cypress method.
         // JQuery will require the "expect" whereas Cypress allows the "should" assertion
-        cy.contains('nb-card', 'Using the Grid').then( firstForm => {
+        cy.contains('nb-card', 'Using the Grid').then(firstForm => {
             const emailLabelFirst = firstForm.find('[for="inputEmail1"]').text()
             const passwordLabelFirst = firstForm.find('[for= "inputPassword2"]').text()
             expect(emailLabelFirst).to.equal('Email')           // Chai assertion
@@ -112,7 +112,56 @@ describe('Training Test Suite 1', () => {
                 // This will accomplish the same effect as the "expect" of JQuery
                 cy.wrap(secondForm).find('[for="exampleInputPassword1"]').should('contain', 'Password')
             })
-
         })
+
+    })
+
+    it('Invoke command', () => {
+
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Form Layouts').click()
+
+        // * Three ways to retrieve text
+        //1 - using the should assertion
+        cy.get('[for="exampleInputEmail1"]').should('contain', 'Email address')
+
+        //2 - using a promise with a Chai "expect" assertion
+        cy.get('[for="exampleInputEmail1"]').then(label => {
+            expect(label.text()).to.equal('Email address')
+        })
+
+        //3 - using a promise with 'invoke' (Cypress function)
+        //    this way does NOT need the additional "text()" method as found in #2 above
+        cy.get('[for="exampleInputEmail1"]').invoke('text').then(text => {
+            expect(text).to.equal('Email address')
+        })
+
+        cy.contains('nb-card', 'Basic form')
+            .find('nb-checkbox')
+            .click()
+            .find('.custom-checkbox')
+            .invoke('attr', 'class')
+            // .should('contain', 'checked')
+            .then(classValue => {
+                expect(classValue).to.contain('checked')    // same result as the should in the previous line
+            }
+        )
+    })
+
+    it.only('Assert property value', () => {
+
+        cy.visit('/')
+        cy.contains('Forms').click()
+        cy.contains('Datepicker').click()
+
+        cy.contains('nb-card', 'Common Datepicker')
+            .find('input')
+            .then(input => {
+                cy.wrap(input).click()     // Since we cannot click on a JQuery element we must "wrap" it
+                cy.get('nb-calendar-day-picker').contains('17').click()
+                cy.wrap(input).invoke('prop', 'value').should('contain', '17')
+
+            })
     })
 })
