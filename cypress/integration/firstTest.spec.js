@@ -216,6 +216,7 @@ describe('Training Test Suite 1', () => {
         // cy.get('nb-layout-header nav').should('have.css', 'background-color', 'rgb(34, 43, 69)')
 
         //2 - Now lets do it using iteration
+        //    (We are not using cy.select because the component is "nb-select" and not "select")
         cy.get('nav nb-select').then(dropdown => {
             cy.wrap(dropdown).click()
             cy.get('.options-list nb-option')  // returns all available options
