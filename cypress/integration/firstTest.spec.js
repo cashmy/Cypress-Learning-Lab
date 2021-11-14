@@ -219,7 +219,7 @@ describe('Training Test Suite 1', () => {
         cy.get('nav nb-select').then(dropdown => {
             cy.wrap(dropdown).click()
             cy.get('.options-list nb-option')  // returns all available options
-                .each(listItem => {
+                .each((listItem, index) => {
                     const itemText = listItem.text().trim()
 
                     const colors = {
@@ -233,7 +233,9 @@ describe('Training Test Suite 1', () => {
                     cy.wrap(dropdown).should('contain', itemText)   // Verify that the dropdown field now has the chosen text
                     cy.get('nb-layout-header nav')
                         .should('have.css', 'background-color', colors[itemText]) // Verify the backround using a variable
-                    cy.wrap(dropdown).click() // Reclick on the dropdown so that the list becomes available in the Dom
+                    if (index < 3) {
+                        cy.wrap(dropdown).click() // Reclick on the dropdown so that the list becomes available in the Dom
+                    }
                 })
         })
     })
