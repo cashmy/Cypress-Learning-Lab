@@ -72,5 +72,41 @@ describe('Training Test Suite 1', () => {
         cy.contains('Forms').click()
         cy.contains('Form Layouts').click()
         
+        // & This is highly redundant and violates the DRY principle
+        // cy.contains('nb-card', 'Using the Grid')
+        //     .find('[for="inputEmail1"]')
+        //     .should('contain', 'Email')
+        // cy.contains('nb-card', 'Using the Grid')
+        //     .find('[for="inputPassword2"]')
+        //     .should('contain', 'Password')
+        // cy.contains('nb-card', 'Basic form')
+        //     .find('[for="exampleInputEmail1"]')
+        //     .should('contain', 'Email')
+        // cy.contains('nb-card', 'Basic form')
+        //     .find('[for="exampleInputPassword1"]')
+        //     .should('contain', 'Password')
+
+        // ! Selenium will do it this way (but selenium is synchronus - this wont work with Cypress)
+        // const firstForm = cy.contains('nb-card', 'Using the Grid')
+        // const secondForm = cy.contains('nb-card', 'Basic form')
+        // firstForm.find('[for="inputEmail1"]').should('contain', 'Email')
+        // firstForm.find('[for= "inputPassword2"]').should('contain', 'Password')
+        // secondForm.find('[for="exampleInputEmail1"]').should('contain', 'Email')
+
+        // * The Cypress way (which is asynchronus - Using a Promise)
+        // The parameter "firstForm" becomes a JQuery method instead of a Cypress method.
+        // JQuery will require the "expect" whereas Cypress allows the "should" assertion
+        cy.contains('nb-card', 'Using the Grid').then( firstForm => {
+            const emailLabelFirst = firstForm.find('[for="inputEmail1"]').text()
+            const passwordLabelFirst = firstForm.find('[for= "inputPassword2"]').text()
+            expect(emailLabelFirst).to.equal('Email')
+            expect(passwordLabelFirst).to.equal('Password')
+
+            // Now compare text on one form with the text on another form
+            cy.contains('nb-card', 'Basic form').then(secondForm => {
+                const passwordLabelSecond = secondForm.find('[for="exampleInputPassword1"]').text()
+                expect(passwordLabelFirst).to.equal(passwordLabelSecond)
+            })
+        })
     })
 })
